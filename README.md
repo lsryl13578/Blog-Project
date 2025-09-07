@@ -8,4 +8,4 @@ Frontend (View): Thymeleaf, Bootstrap
 
 Database: MySQL (or H2 for test)
 
-Build Tool: Gradle/Maven
+Build Tool: Gradle
