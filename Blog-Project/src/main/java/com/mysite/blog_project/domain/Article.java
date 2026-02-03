@@ -36,11 +36,11 @@ public class Article {
 	
 	@CreatedDate
 	@Column(name = "created_at")
-	private LocalDateTime createdAt;
+	private LocalDateTime createdAt;	// 게시글의 작성일 칼럼
 	
 	@LastModifiedDate
 	@Column(name = "updated_at")
-	private LocalDateTime updatedAt;
+	private LocalDateTime updatedAt;	// 게시글의 수정일 칼럼
 	
 	@Builder // 빌더 패턴으로 객체 생성
 	public Article(String title, String content) {
