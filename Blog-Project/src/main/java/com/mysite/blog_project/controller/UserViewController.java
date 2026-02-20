@@ -9,7 +9,7 @@ public class UserViewController {
 	// 로그인 페이지를 반환
 	@GetMapping("/login")
 	public String login() {
-		return "login";
+		return "oauthLogin";
 	}
 	
 	// 회원가입 페이지를 반환

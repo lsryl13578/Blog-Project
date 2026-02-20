@@ -1,4 +1,6 @@
-package com.mysite.blog_project.config;
+// OAuth2를 이용한 구글 로그인 기능 구현에 따라 임시로 전체 코드를 주석 처리함
+
+/* package com.mysite.blog_project.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -52,4 +54,4 @@ public class WebSecurityConfig {
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-}
+} */
