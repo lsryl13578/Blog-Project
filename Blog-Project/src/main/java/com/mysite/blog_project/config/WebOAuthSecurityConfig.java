@@ -17,6 +17,7 @@ import com.mysite.blog_project.config.oauth.OAuth2AuthorizationRequestBasedOnCoo
 import com.mysite.blog_project.config.oauth.OAuth2SuccessHandler;
 import com.mysite.blog_project.config.oauth.OAuth2UserCustomService;
 import com.mysite.blog_project.repository.RefreshTokenRepository;
+import com.mysite.blog_project.service.UserDetailService;
 import com.mysite.blog_project.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class WebOAuthSecurityConfig {
 	private final TokenProvider tokenProvider;
 	private final RefreshTokenRepository refreshTokenRepository;
 	private final UserService userService;
+	private final UserDetailService userDetailService;
 	
 	@Bean
 	public WebSecurityCustomizer configure() {	// 스프링 시큐리티 기능 비활성화
@@ -38,21 +40,25 @@ public class WebOAuthSecurityConfig {
 	
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		// 토큰 방식으로 인증을 하기 때문에 기존에 사용하던 폼 로그인, 세션 비활성화
 		return http
 				.csrf(AbstractHttpConfigurer::disable)
 				.httpBasic(AbstractHttpConfigurer::disable)
-				.formLogin(AbstractHttpConfigurer::disable)
-				.logout(AbstractHttpConfigurer::disable)
-				.sessionManagement(management ->
-				management.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+				.formLogin(formLogin -> formLogin
+						.loginPage("/login")
+						.defaultSuccessUrl("/articles")
+				)
+				.userDetailsService(userDetailService)
+				.sessionManagement(session -> session
+						.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+						.sessionFixation().newSession()
+				)
 				// 헤더를 확인할 커스텀 필터 추가
 				.addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 				// 토큰 재발급 URL은 인증 없이 접근 가능하도록 설정. 나머지 API URL은 인증 필요
 				.authorizeHttpRequests(auth -> auth
 						.requestMatchers("/api/token").permitAll()
-						.requestMatchers("/articles/**").authenticated()
 						.requestMatchers("/api/**").authenticated()
+						.requestMatchers("/login", "/signup").permitAll()
 						.anyRequest().permitAll()
 				)
 				.oauth2Login(oauth2 -> oauth2
@@ -61,6 +67,13 @@ public class WebOAuthSecurityConfig {
 						.userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint.userService(oAuth2UserCustomService))
 						// 인증 성공 시 실행할 핸들러
 						.successHandler(oAuth2SuccessHandler())
+				)
+				.logout(logout -> logout
+						.logoutUrl("/logout")
+						.logoutSuccessUrl("/articles?logout=true")
+						.invalidateHttpSession(true)
+						.clearAuthentication(true)
+						.deleteCookies("JSESSIONID", "access_token", "refresh_token", "oauth2_auth_request")
 				)
 				// /api로 시작하는 url인 경우 401 상태 코드를 반환하도록 예외 처리
 				.exceptionHandling(exceptionHandling -> exceptionHandling
