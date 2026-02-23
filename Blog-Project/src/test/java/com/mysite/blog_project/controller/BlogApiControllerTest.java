@@ -60,18 +60,6 @@ class BlogApiControllerTest {
 		userRepository.deleteAll();
 	}
 	
-	/*@BeforeEach
-	void setSecurityContext() {
-		userRepository.deleteAll();
-		user = userRepository.save(User.builder()
-				.email("user@gmail.com")
-				.password("test")
-				.build());
-		
-		SecurityContext context = SecurityContextHolder.getContext();
-		context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities()));
-	}*/
-	
 	@DisplayName("addArticle: 블로그 글 추가에 성공한다.")
 	@Test
 	public void addArticle() throws Exception {
