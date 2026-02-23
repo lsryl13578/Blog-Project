@@ -18,9 +18,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -59,9 +57,10 @@ class BlogApiControllerTest {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
 				.build();
 		blogRepository.deleteAll();
+		userRepository.deleteAll();
 	}
 	
-	@BeforeEach
+	/*@BeforeEach
 	void setSecurityContext() {
 		userRepository.deleteAll();
 		user = userRepository.save(User.builder()
@@ -71,13 +70,21 @@ class BlogApiControllerTest {
 		
 		SecurityContext context = SecurityContextHolder.getContext();
 		context.setAuthentication(new UsernamePasswordAuthenticationToken(user, user.getPassword(), user.getAuthorities()));
-	}
+	}*/
 	
 	@DisplayName("addArticle: 블로그 글 추가에 성공한다.")
 	@Test
 	public void addArticle() throws Exception {
 		// given
 		final String url = "/api/articles";
+		final String email = "test@test.com";
+		
+		userRepository.save(User.builder()
+				.email(email)
+				.password("12")
+				.nickname("테스트")
+				.build());
+		
 		final String title = "title";
 		final String content = "content";
 		final AddArticleRequest userRequest = new AddArticleRequest(title, content);
@@ -86,7 +93,7 @@ class BlogApiControllerTest {
 		final String requestBody = objectMapper.writeValueAsString(userRequest);
 		
 		Principal principal = Mockito.mock(Principal.class);
-		Mockito.when(principal.getName()).thenReturn("username");
+		Mockito.when(principal.getName()).thenReturn(email);
 		
 		// when
 		// 설정한 내용을 바탕으로 요청 전송
@@ -143,9 +150,10 @@ class BlogApiControllerTest {
 	
 	@DisplayName("deleteArticle: 블로그 글 삭제에 성공한다.")
 	@Test
+	@WithMockUser(username = "test@test.com")
 	public void deleteArticle() throws Exception {
 		// given
-		final String url = "/api/articles/{id}";
+		final String url = "/api/articles/{id}";	
 		Article savedArticle = createDefaultArticle();
 
 		// when
@@ -160,6 +168,7 @@ class BlogApiControllerTest {
 	
 	@DisplayName("updateArticle: 블로그 글 수정에 성공한다.")
 	@Test
+	@WithMockUser(username = "test@test.com")
 	public void updateArticle() throws Exception {
 		// given
 		final String url = "/api/articles/{id}";
@@ -185,10 +194,18 @@ class BlogApiControllerTest {
 	}
 	
 	private Article createDefaultArticle() {
+		String email = "test@test.com";
+		
+		User user = userRepository.save(User.builder()
+				.email(email)
+				.password("12")
+				.nickname("테스트")
+				.build());
+		
 		return blogRepository.save(Article.builder()
 				.title("title")
-				//.author(user.getUsername())
 				.content("content")
+				.user(user)
 				.build());
 	}
 }
