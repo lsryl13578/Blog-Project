@@ -13,4 +13,7 @@ public class AddUserRequest {
 	
 	// 사용자 비밀번호
 	private String password;
+	
+	// 사용자 닉네임
+	private String nickname;
 }

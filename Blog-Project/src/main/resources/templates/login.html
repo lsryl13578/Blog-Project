@@ -30,11 +30,14 @@
               <label class="form-label text-white">Password</label>
               <input type="password" class="form-control" name="password">
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">로그인</button>
           </form>
 
-          <button type="button" class="btn btn-secondary mt-3" onclick="location.href='/signup'">회원가입</button>
-		  <div class="mt-5">
+          <div class="mt-3 text-center">
+			<span class="text-white-50">아직 계정이 없으신가요?</span>
+			<a href="/signup" class="text-decoration-none fw-bold">회원가입</a>
+		  </div>
+		  <div class="mt-3">
 			<a href="/oauth2/authorization/google">
 				<img src="/img/google.png">
 			</a>
