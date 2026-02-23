@@ -53,9 +53,10 @@ public class Article {
 	private User user;
 	
 	@Builder // 빌더 패턴으로 객체 생성
-	public Article(String title, String content, String auth) {
+	public Article(String title, String content, User user) {
 		this.title = title;
 		this.content = content;
+		this.user = user;
 	}
 	
 	// 엔티티에 요청받은 내용으로 값을 수정하는 메서드
